@@ -1,0 +1,82 @@
+name: Universe checks
+
+on:
+  pull_request:
+    paths:
+      - 'beep/**'
+      - 'auth-config.js'
+      - 'storefront-config.js'
+      - 'auth.js'
+      - 'index.html'
+      - 'app.js'
+      - 'styles.css'
+      - 'supabase/**'
+      - 'templates/**'
+      - 'world/**'
+      - '.github/workflows/universe-checks.yml'
+  push:
+    branches:
+      - main
+      - fix/consolidate-universe
+    paths:
+      - 'beep/**'
+      - 'auth-config.js'
+      - 'storefront-config.js'
+      - 'auth.js'
+      - 'index.html'
+      - 'app.js'
+      - 'styles.css'
+      - 'supabase/**'
+      - 'templates/**'
+      - 'world/**'
+      - '.github/workflows/universe-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test operational tooling
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: beep
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: beep/go.sum
+      - run: |
+          node --check ../app.js
+          node --check ../auth-config.js
+          node --check ../storefront-config.js
+          node --check ../auth.js
+          node --check ../world/script.js
+      - name: Verify launch safeguards
+        working-directory: .
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          const html = fs.readFileSync("index.html", "utf8");
+          const app = fs.readFileSync("app.js", "utf8");
+          const checks = [
+            ["canonical address is not an enabled link", !html.includes('href="https://wenevergonnaclose.com')],
+            ["unconfigured crumb intake is disabled", /id="crumb-category"[^>]*disabled/.test(html)
+              && /id="crumb-source"[^>]*disabled/.test(html)
+              && /id="crumb-content"[^>]*disabled/.test(html)
+              && /id="crumb-rights"[^>]*disabled/.test(html)
+              && /type="submit" disabled/.test(html)],
+            ["unconfigured crumb intake explains its status", html.includes("Submissions are currently unavailable because the member sign-in system is not configured.")],
+            ["private pass links remain on the current page", app.includes("return location.origin+location.pathname+'?u='+encodeURIComponent(pass);")]
+          ];
+
+          for (const [name, passed] of checks) {
+            if (!passed) {
+              throw new Error(`Launch safeguard failed: ${name}`);
+            }
+          }
+          NODE
+      - run: go test ./...

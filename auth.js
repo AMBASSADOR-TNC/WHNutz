@@ -28,6 +28,13 @@ function setCrumbStatus(message) {
   crumbStatus.textContent = message;
 }
 
+function setCrumbAvailability(enabled) {
+  crumbForm.querySelectorAll("input, select, textarea, button").forEach(control => {
+    control.disabled = !enabled;
+  });
+  crumbForm.setAttribute("aria-disabled", String(!enabled));
+}
+
 function destinationUrl() {
   const url = new URL(location.href);
   if (awardCode) {
@@ -38,13 +45,15 @@ function destinationUrl() {
 
 async function loadAuth() {
   if (!isConfigured()) {
+    setCrumbAvailability(false);
     crumbForm.addEventListener("submit", event => {
       event.preventDefault();
-      setCrumbStatus("The crumb workshop opens after the member sign-in system is configured.");
+      setCrumbStatus("Submissions are currently unavailable because the member sign-in system is not configured.");
     });
     return;
   }
 
+  setCrumbAvailability(true);
   signInPanel.hidden = false;
   if (awardCode) {
     signInCopy.textContent = "Your Dedication Award is ready. Use the email it was issued to so we can restore your place.";

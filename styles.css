@@ -85,7 +85,7 @@ main{margin-left:var(--rail)}
 }
 .lede{font-size:clamp(1.1rem,2vw,1.5rem);max-width:46rem}
 .canonical-handoff{max-width:46rem;padding:.85rem 1rem;border-left:4px solid var(--green);background:#fffdf8;font-weight:700;line-height:1.5}
-.canonical-handoff a{color:var(--ink)}
+.canonical-handoff code{font:inherit}
 .welcome-scene{
   margin:2rem 0;
   padding:1.4rem;
@@ -207,6 +207,7 @@ main{margin-left:var(--rail)}
 .crumb-workshop textarea{resize:vertical}
 .crumb-workshop .crumb-consent{display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem;font-weight:700}
 .crumb-workshop button{justify-self:start;border:0;border-radius:.7rem;padding:.8rem 1rem;background:var(--green);color:#fff;font-weight:900;cursor:pointer}
+.crumb-workshop :disabled{cursor:not-allowed;opacity:.65}
 .crumb-note{font-size:.85rem}
 .crumb-note a{color:var(--ink);font-weight:900}
 .ambassador-path{

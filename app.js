@@ -193,7 +193,7 @@ function validPass(value){
   return typeof value==='string'&&/^\+U-[A-Z0-9]{1,32}-[A-Z0-9]{4}$/.test(value);
 }
 function passUrl(pass){
-  return 'https://wenevergonnaclose.com/?u='+encodeURIComponent(pass);
+  return location.origin+location.pathname+'?u='+encodeURIComponent(pass);
 }
 function syncPassFromQuery(){
   const params=new URLSearchParams(location.search);
